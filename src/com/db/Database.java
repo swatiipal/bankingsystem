@@ -37,33 +37,18 @@ public class Database {
     }
 
     public void addAdmin(String name, String userName, String password, String bankName) throws SQLException {
-        String adminquery = "INSERT INTO admin (name,username,password,bank_name) VALUES (" + "'" + name + "'" + "," + "'" + userName + "'" + "," + "'" + password + "'" + "," + "'" + bankName + "'" + ")";
         try (Statement stmt = con.createStatement()) {
-            String query = "select * from admin";
-            ResultSet result = stmt.executeQuery(query);
-            List<AdminsDto> adminDto = (List<AdminsDto>) result;
-//            while(result.next()){
-//                for (AdminsDto admin : adminDto) {
-//                    admin.setId(result.getString("id"));
-//                    admin.setName(result.getString("name"));
-//                    admin.setUserName(result.getString("username"));
-//                    admin.setPassword(result.getString("password"));
-//                    admin.setBankName(result.getString("bank_name"));
-//                }
-//            }
-            System.out.println(adminDto);
-//            while (rs.next()) {
-//                String coffeeName = rs.getString("COF_NAME");
-//                int supplierID = rs.getInt("SUP_ID");
-//                float price = rs.getFloat("PRICE");
-//                int sales = rs.getInt("SALES");
-//                int total = rs.getInt("TOTAL");
-//                System.out.println(coffeeName + ", " + supplierID + ", " + price +
-//                        ", " + sales + ", " + total);
-//
-//                stmt.executeUpdate(adminquery);
-//                System.out.println("Admin added Successfully..");
-//            }
+            String fetchBankIdQuery = "SELECT id from admin where bank_name="+"'"+bankName.toLowerCase()+"'"+" limit 1";
+            ResultSet result = stmt.executeQuery(fetchBankIdQuery);
+            if(result.next()){
+                    String adminQuery = "INSERT INTO admin (name,username,password,bank_name,bank_id) VALUES (" + "'" + name + "'" + "," + "'" + userName + "'" + "," + "'" + password + "'" + "," + "'" + bankName.toLowerCase() + "'" +","+ Integer.parseInt(result.getString("id"))+ ")";
+                    stmt.executeUpdate(adminQuery);
+                    System.out.println("Admin added Successfully..");
+            }else{
+                String newAdminQuery = "INSERT INTO admin (name,username,password,bank_name) VALUES (" + "'" + name + "'" + "," + "'" + userName + "'" + "," + "'" + password + "'" + "," + "'" + bankName.toLowerCase() + "'" +")";
+                stmt.executeUpdate(newAdminQuery);
+                System.out.println("Admin added Successfully..");
+            }
         }
         catch(Exception e){
             System.out.println("Error occurred while executing admin query: " + e);
